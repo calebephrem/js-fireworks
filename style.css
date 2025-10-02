@@ -1,0 +1,41 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  height: 100dvh;
+  width: 100dvw;
+  font-family: Arial, Helvetica, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+canvas {
+  z-index: -1;
+}
+
+.text {
+  position: fixed;
+  top: 10%;
+  left: 50%;
+  translate: -50% 0;
+}
+
+.text > h1 {
+  -webkit-text-stroke: 1px;
+  -webkit-text-stroke-color: #f9f9f9;
+  color: transparent;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.text > p {
+  text-align: center;
+  font-size: 0.8rem;
+  color: #bbb;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
