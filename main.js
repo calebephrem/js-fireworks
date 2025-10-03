@@ -70,24 +70,22 @@ addEventListener('click', (e) => {
   mouse.x = e.clientX;
   mouse.y = e.clientY;
 
-  const particleCount = 1234;
+  const particleCount = 1000;
 
   const angleIncrement = (Math.PI * 2) / particleCount;
 
   for (let i = 0; i < particleCount; i++) {
+    const fireworkColor = `rgb(${Math.floor(
+      100 + Math.random() * 155
+    )}, ${Math.floor(100 + Math.random() * 155)}, ${Math.floor(
+      100 + Math.random() * 155
+    )})`;
+
     particles.push(
-      new Particle(
-        mouse.x,
-        mouse.y,
-        3,
-        `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${
-          Math.random() * 255
-        })`,
-        {
-          x: Math.cos(angleIncrement * i) * Math.random(),
-          y: Math.sin(angleIncrement * i) * Math.random(),
-        }
-      )
+      new Particle(mouse.x, mouse.y, 3, fireworkColor, {
+        x: Math.cos(angleIncrement * i) * Math.random(),
+        y: Math.sin(angleIncrement * i) * Math.random(),
+      })
     );
   }
 });
