@@ -2,6 +2,8 @@
 
 A simple web project that triggers fireworks wherever you click on the page. No libraries, no build tools — just HTML, CSS, and JavaScript.
 
+![Screenshot](assets/screenshot.png)
+
 ## 🚀 How It Works
 
 - Click anywhere on the document
