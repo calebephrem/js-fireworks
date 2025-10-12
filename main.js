@@ -2,12 +2,11 @@ const canvas = document.querySelector('canvas');
 const c = canvas.getContext('2d');
 
 function adjustCanvasSize() {
-  canvas.height = innerHeight;
   canvas.width = innerWidth;
+  canvas.height = innerHeight;
 }
 adjustCanvasSize();
-
-addEventListener('resize', () => adjustCanvasSize);
+addEventListener('resize', adjustCanvasSize);
 
 const mouse = {
   x: innerWidth / 2,
@@ -15,19 +14,20 @@ const mouse = {
 };
 
 class Particle {
-  constructor(x, y, r, c, v) {
+  constructor(x, y, r, color, velocity) {
     this.x = x;
     this.y = y;
     this.r = r;
-    this.color = c;
-    this.v = v;
-    this.gravity = 0.99;
-    this.friction = 0.05;
-    this.power = 10;
+    this.color = color;
+    this.velocity = velocity;
+    this.gravity = 0.01;
+    this.friction = 1;
+    this.alpha = 2;
   }
 
   draw() {
     c.save();
+    c.globalAlpha = this.alpha;
     c.beginPath();
     c.arc(this.x, this.y, this.r, 0, Math.PI * 2, false);
     c.fillStyle = this.color;
@@ -37,33 +37,29 @@ class Particle {
   }
 
   update() {
+    this.velocity.x *= this.friction;
+    this.velocity.y *= this.friction;
+    this.velocity.y += this.gravity;
+
+    this.x += this.velocity.x;
+    this.y += this.velocity.y;
+    this.alpha -= 0.005;
+
     this.draw();
-
-    this.y += this.gravity;
-
-    this.x += this.v.x * this.power;
-    this.y += this.v.y * this.power;
   }
 }
 
-let particles;
-
-function init() {
-  particles = [];
-}
+let particles = [];
 
 function animate() {
   requestAnimationFrame(animate);
-  // c.clearRect(0, 0, canvas.width, canvas.height);
-  c.fillStyle = 'rgba(0, 0, 0, 0.01)';
-  c.fillRect(0, 0, innerWidth, innerHeight);
+  c.fillStyle = 'rgba(0, 0, 0, 0.09)';
+  c.fillRect(0, 0, canvas.width, canvas.height);
 
-  particles.forEach((particle) => {
-    particle.update();
-  });
+  particles = particles.filter(p => p.alpha > 0);
+  particles.forEach(p => p.update());
 }
 
-init();
 animate();
 
 addEventListener('click', (e) => {
@@ -71,21 +67,20 @@ addEventListener('click', (e) => {
   mouse.y = e.clientY;
 
   const particleCount = 1000;
-
   const angleIncrement = (Math.PI * 2) / particleCount;
 
   for (let i = 0; i < particleCount; i++) {
-    const fireworkColor = `rgb(${Math.floor(
-      100 + Math.random() * 155
-    )}, ${Math.floor(100 + Math.random() * 155)}, ${Math.floor(
-      100 + Math.random() * 155
-    )})`;
+    const angle = angleIncrement * i;
+    const speed = Math.random() * 10 + 2;
 
-    particles.push(
-      new Particle(mouse.x, mouse.y, 3, fireworkColor, {
-        x: Math.cos(angleIncrement * i) * Math.random(),
-        y: Math.sin(angleIncrement * i) * Math.random(),
-      })
-    );
+    const velocity = {
+      x: Math.cos(angle) * speed,
+      y: Math.sin(angle) * speed,
+    };
+
+    const hue = Math.floor(Math.random() * 360);
+    const color = `hsl(${hue}, 100%, 60%)`;
+
+    particles.push(new Particle(mouse.x, mouse.y, 4, color, velocity));
   }
 });
