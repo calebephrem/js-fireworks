@@ -1,12 +1,13 @@
 const canvas = document.querySelector('canvas');
 const c = canvas.getContext('2d');
 
-function adjustCanvasSize() {
+// Adjust canvas to fill screen
+function resizeCanvas() {
   canvas.width = innerWidth;
   canvas.height = innerHeight;
 }
-adjustCanvasSize();
-addEventListener('resize', adjustCanvasSize);
+resizeCanvas();
+addEventListener('resize', resizeCanvas);
 
 const mouse = {
   x: innerWidth / 2,
@@ -14,38 +15,41 @@ const mouse = {
 };
 
 class Particle {
-  constructor(x, y, r, color, velocity) {
+  constructor(x, y, radius, color, velocity) {
     this.x = x;
     this.y = y;
-    this.r = r;
+    this.radius = radius;
     this.color = color;
     this.velocity = velocity;
-    this.gravity = 0.01;
+    this.alpha = 3;
+    this.gravity = 0.02;
     this.friction = 1;
-    this.alpha = 2;
   }
 
   draw() {
     c.save();
     c.globalAlpha = this.alpha;
     c.beginPath();
-    c.arc(this.x, this.y, this.r, 0, Math.PI * 2, false);
+    c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
     c.fillStyle = this.color;
+    c.shadowBlur = 20;
+    c.shadowColor = this.color;
     c.fill();
     c.closePath();
     c.restore();
   }
 
   update() {
+    this.draw();
+
+    // Apply friction + gravity
     this.velocity.x *= this.friction;
     this.velocity.y *= this.friction;
     this.velocity.y += this.gravity;
 
     this.x += this.velocity.x;
     this.y += this.velocity.y;
-    this.alpha -= 0.005;
-
-    this.draw();
+    this.alpha -= 0.01;
   }
 }
 
@@ -53,11 +57,18 @@ let particles = [];
 
 function animate() {
   requestAnimationFrame(animate);
-  c.fillStyle = 'rgba(0, 0, 0, 0.09)';
+
+  // Create smooth trails instead of clearing completely
+  c.fillStyle = 'rgba(0, 0, 0, 0.05)';
   c.fillRect(0, 0, canvas.width, canvas.height);
 
-  particles = particles.filter(p => p.alpha > 0);
-  particles.forEach(p => p.update());
+  particles.forEach((particle, i) => {
+    if (particle.alpha <= 0) {
+      particles.splice(i, 1);
+    } else {
+      particle.update();
+    }
+  });
 }
 
 animate();
@@ -66,21 +77,40 @@ addEventListener('click', (e) => {
   mouse.x = e.clientX;
   mouse.y = e.clientY;
 
-  const particleCount = 1000;
+  const particleCount = 200;
   const angleIncrement = (Math.PI * 2) / particleCount;
+  const baseColorHue = Math.random() * 360;
 
   for (let i = 0; i < particleCount; i++) {
-    const angle = angleIncrement * i;
-    const speed = Math.random() * 10 + 2;
-
-    const velocity = {
-      x: Math.cos(angle) * speed,
-      y: Math.sin(angle) * speed,
-    };
-
-    const hue = Math.floor(Math.random() * 360);
-    const color = `hsl(${hue}, 100%, 60%)`;
-
-    particles.push(new Particle(mouse.x, mouse.y, 4, color, velocity));
+    particles.push(
+      new Particle(mouse.x, mouse.y, 3, 
+        `hsl(${baseColorHue + i * 2}, 70%, 60%)`, 
+        {
+          x: Math.cos(angleIncrement * i) * (Math.random() * 6),
+          y: Math.sin(angleIncrement * i) * (Math.random() * 6),
+        }
+      )
+    );
   }
 });
+
+// Auto fireworks every few seconds
+setInterval(() => {
+  const x = Math.random() * innerWidth;
+  const y = Math.random() * innerHeight * 0.7;
+  const particleCount = 80;
+  const angleIncrement = (Math.PI * 2) / particleCount;
+  const baseHue = Math.random() * 360;
+
+  for (let i = 0; i < particleCount; i++) {
+    particles.push(
+      new Particle(x, y, 3,
+        `hsl(${baseHue + i * 2}, 80%, 60%)`,
+        {
+          x: Math.cos(angleIncrement * i) * (Math.random() * 5),
+          y: Math.sin(angleIncrement * i) * (Math.random() * 5),
+        }
+      )
+    );
+  }
+}, 1500);
