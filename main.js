@@ -93,24 +93,3 @@ addEventListener('click', (e) => {
     );
   }
 });
-
-// Auto fireworks every few seconds
-setInterval(() => {
-  const x = Math.random() * innerWidth;
-  const y = Math.random() * innerHeight * 0.7;
-  const particleCount = 80;
-  const angleIncrement = (Math.PI * 2) / particleCount;
-  const baseHue = Math.random() * 360;
-
-  for (let i = 0; i < particleCount; i++) {
-    particles.push(
-      new Particle(x, y, 3,
-        `hsl(${baseHue + i * 2}, 80%, 60%)`,
-        {
-          x: Math.cos(angleIncrement * i) * (Math.random() * 5),
-          y: Math.sin(angleIncrement * i) * (Math.random() * 5),
-        }
-      )
-    );
-  }
-}, 1500);
